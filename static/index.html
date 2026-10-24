@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Maintainer Copilot Playground</title>
+<style>
+  :root {
+    --bg: #f6f8fa; --panel: #ffffff; --ink: #1f2328; --muted: #59636e; --line: #d1d9e0;
+    --accent: #1f883d; --accent-ink: #fff; --link: #0969da; --code-bg: #eff2f5; --err: #d1242f; --err-bg: #ffebe9;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0d1117; --panel: #151b23; --ink: #e6edf3; --muted: #9198a1; --line: #3d444d;
+      --accent: #238636; --link: #4493f8; --code-bg: #262c36; --err: #f85149; --err-bg: #3c1618;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+         font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif; }
+  a { color: var(--link); }
+  header { padding: 20px 24px 6px; max-width: 1280px; margin: 0 auto; }
+  h1 { margin: 0; font-size: 22px; }
+  .sub { color: var(--muted); margin-top: 2px; }
+  main { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; padding: 14px 24px 32px;
+         max-width: 1280px; margin: 0 auto; }
+  @media (max-width: 900px) { main { grid-template-columns: 1fr; padding: 12px 16px 24px; } header { padding: 16px 16px 4px; } }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 16px; min-width: 0; }
+  .panel h2 { font-size: 15px; margin: 0 0 12px; }
+  label { display: block; font-weight: 600; margin: 12px 0 6px; }
+  input[type=text], textarea { width: 100%; font: inherit; color: var(--ink); background: var(--bg);
+         border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; }
+  textarea { min-height: 170px; resize: vertical; }
+  .examples { display: flex; flex-wrap: wrap; gap: 6px; }
+  .examples span { color: var(--muted); margin-right: 4px; align-self: center; }
+  button { font: inherit; border-radius: 6px; border: 1px solid var(--line); background: var(--bg); color: var(--ink);
+           padding: 5px 12px; cursor: pointer; }
+  button:hover { border-color: var(--muted); }
+  button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 600; padding: 8px 18px; }
+  button.primary:disabled { opacity: .6; cursor: progress; }
+  .drop { margin-top: 10px; border: 1.5px dashed var(--line); border-radius: 6px; padding: 12px; text-align: center;
+          color: var(--muted); cursor: pointer; }
+  .drop.over { border-color: var(--link); color: var(--link); }
+  .drop img { display: block; max-width: 100%; max-height: 140px; margin: 8px auto 6px; border-radius: 4px; }
+  .actions { display: flex; justify-content: flex-end; margin-top: 14px; }
+  .repo { color: var(--muted); font-size: 13px; margin-top: 12px; }
+  .issue-head { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; margin-bottom: 8px; }
+  .issue-head .title { font-size: 18px; font-weight: 600; }
+  .issue-head .num { color: var(--muted); font-size: 18px; }
+  .labels { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+  .chip { font-size: 12px; font-weight: 600; padding: 1px 9px; border-radius: 99px; border: 1px solid; }
+  .comment { border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+  .comment .who { background: var(--bg); border-bottom: 1px solid var(--line); padding: 8px 12px; color: var(--muted); font-size: 13px; }
+  .comment .who b { color: var(--ink); }
+  .comment .md { padding: 4px 14px 12px; overflow-wrap: anywhere; }
+  .md h3 { font-size: 16px; margin: 10px 0 6px; }
+  .md p { margin: 8px 0; }
+  .md ul { margin: 6px 0; padding-left: 4px; list-style: none; }
+  .md code { background: var(--code-bg); border-radius: 4px; padding: 1px 5px; font-size: 12.5px; }
+  .md small { color: var(--muted); }
+  .empty { color: var(--muted); text-align: center; padding: 60px 10px; }
+  .empty b { display: block; font-size: 36px; margin-bottom: 6px; }
+  .spinner { width: 30px; height: 30px; border: 3px solid var(--line); border-top-color: var(--accent); border-radius: 50%;
+             animation: spin .9s linear infinite; margin: 0 auto 10px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .error { color: var(--err); background: var(--err-bg); border-radius: 6px; padding: 12px; white-space: pre-wrap; }
+  .meta { color: var(--muted); font-size: 12.5px; margin-top: 10px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>🤖 Maintainer Copilot <span style="font-weight:400;color:var(--muted)">Playground</span></h1>
+  <div class="sub">Write an issue the way a real user would, then see how the Gemma 4 triage bot would respond. Nothing gets posted to GitHub.</div>
+</header>
+<main>
+  <section class="panel">
+    <h2>New issue</h2>
+    <div class="examples"><span>Try:</span>
+      <button type="button" data-ex="screenshot">🖼️ Screenshot only</button>
+      <button type="button" data-ex="duplicate">🔁 A duplicate</button>
+      <button type="button" data-ex="vague">📝 Vague bug</button>
+      <button type="button" data-ex="gfi">✨ Good first issue</button>
+    </div>
+    <label for="title">Title</label>
+    <input type="text" id="title" placeholder="Short summary of the problem or idea" maxlength="256">
+    <label for="body">Description</label>
+    <textarea id="body" placeholder="What happened? Steps, versions, logs… or leave it vague and see what the bot asks for."></textarea>
+    <div class="drop" id="drop" tabindex="0">
+      Drop, paste or click to attach a <b>screenshot</b> (PNG, JPEG, WebP)
+      <input type="file" id="file" accept="image/png,image/jpeg,image/webp" hidden>
+      <div id="preview"></div>
+    </div>
+    <div class="actions"><button class="primary" id="go" type="button">Submit new issue</button></div>
+    <div class="repo" id="repo"></div>
+  </section>
+
+  <section class="panel" id="out">
+    <div class="empty"><b>💬</b>The bot's labels and comment appear here, exactly as they'd be posted on GitHub.</div>
+  </section>
+</main>
+
+<script>
+const $ = (s) => document.querySelector(s);
+let image = null;
+
+const EXAMPLES = {
+  screenshot: { title: "Action fails at the end of the run", body: "", img: "/samples/ci-403-error.png" },
+  duplicate: { title: "Bot errors out on issues that only have a title",
+               body: "Whenever someone opens an issue without writing anything in the description, the workflow dies with a TypeError." },
+  vague: { title: "Broken", body: "doesnt work on my repo. pls fix" },
+  gfi: { title: "Add a link to the Gemma 4 docs in the README",
+         body: "The README mentions Gemma 4 but doesn't link to it. A link to the Gemma docs in the \"How it works\" section would help new users." },
+};
+
+fetch("/api/issues").then(r => r.json()).then(d => {
+  const url = `https://github.com/${d.repo}/issues`;
+  $("#repo").innerHTML = `Duplicates are checked against the <a href="${url}" target="_blank" rel="noopener">${d.issues.length} open issues</a> in <b>${esc(d.repo)}</b>, the repo where the real bot runs.`;
+}).catch(() => {});
+
+document.querySelectorAll("[data-ex]").forEach(b => b.onclick = async () => {
+  const ex = EXAMPLES[b.dataset.ex];
+  $("#title").value = ex.title; $("#body").value = ex.body;
+  clearImage();
+  if (ex.img) {
+    const blob = await (await fetch(ex.img)).blob();
+    setImage(new File([blob], "ci-log.png", { type: blob.type }));
+  }
+});
+
+// ---- screenshot: click, drag-drop, or paste
+const drop = $("#drop");
+drop.onclick = (e) => { if (e.target.tagName !== "BUTTON") $("#file").click(); };
+drop.onkeydown = (e) => { if (e.key === "Enter" || e.key === " ") $("#file").click(); };
+$("#file").onchange = (e) => e.target.files[0] && setImage(e.target.files[0]);
+drop.ondragover = (e) => { e.preventDefault(); drop.classList.add("over"); };
+drop.ondragleave = () => drop.classList.remove("over");
+drop.ondrop = (e) => { e.preventDefault(); drop.classList.remove("over"); e.dataTransfer.files[0] && setImage(e.dataTransfer.files[0]); };
+document.addEventListener("paste", (e) => {
+  const f = [...(e.clipboardData?.files || [])].find(f => f.type.startsWith("image/"));
+  if (f) { e.preventDefault(); setImage(f); }
+});
+function clearImage() { image = null; $("#preview").innerHTML = ""; $("#file").value = ""; }
+function setImage(file) {
+  if (!["image/png", "image/jpeg", "image/webp"].includes(file.type)) { alert("Please use a PNG, JPEG or WebP screenshot."); return; }
+  if (file.size > 5 * 1024 * 1024) { alert("Screenshots must be under 5 MB."); return; }
+  const reader = new FileReader();
+  reader.onload = () => {
+    image = { mime: file.type, data: reader.result.split(",")[1] };
+    $("#preview").innerHTML = `<img src="${reader.result}" alt="Attached screenshot"><button type="button" id="rm">Remove</button>`;
+    $("#rm").onclick = (ev) => { ev.stopPropagation(); clearImage(); };
+  };
+  reader.readAsDataURL(file);
+}
+
+// ---- submit
+$("#go").onclick = async () => {
+  const title = $("#title").value.trim();
+  if (!title) { $("#title").focus(); return; }
+  $("#go").disabled = true;
+  $("#out").innerHTML = `<div class="empty"><div class="spinner"></div>Gemma 4 is triaging your issue…<br><small id="elapsed">0 s</small></div>`;
+  const started = Date.now();
+  const timer = setInterval(() => { const el = $("#elapsed"); if (el) el.textContent = Math.round((Date.now() - started) / 1000) + " s"; }, 1000);
+  try {
+    const res = await fetch("/api/triage", { method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title, body: $("#body").value, image }) });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || res.statusText);
+    render(data, title, (Date.now() - started) / 1000);
+  } catch (err) {
+    $("#out").innerHTML = `<div class="error"></div>`;
+    $("#out .error").textContent = "Something went wrong:\n" + err.message;
+  } finally {
+    clearInterval(timer); $("#go").disabled = false;
+  }
+};
+
+function esc(s) { return String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
+
+// Tiny renderer for the subset of Markdown the bot writes.
+function inline(s) {
+  return esc(s)
+    .replace(/`([^`]+)`/g, "<code>$1</code>")
+    .replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>")
+    .replace(/(^|\s)#(\d+)\b/g, `$1<a href="https://github.com/imadxzl/maintainer-copilot/issues/$2" target="_blank" rel="noopener">#$2</a>`);
+}
+function markdown(md) {
+  let html = "", list = false;
+  for (const line of md.split("\n")) {
+    if (line.startsWith("<!--")) continue;
+    const item = line.match(/^- \[ \] (.*)/);
+    if (item) { if (!list) { html += "<ul>"; list = true; } html += `<li>☐ ${inline(item[1])}</li>`; continue; }
+    if (list) { html += "</ul>"; list = false; }
+    if (line.startsWith("### ")) html += `<h3>${inline(line.slice(4))}</h3>`;
+    else if (line.startsWith("<sub>")) html += `<p><small>${inline(line.replace(/<\/?sub>/g, ""))}</small></p>`;
+    else if (line.trim()) html += `<p>${inline(line)}</p>`;
+  }
+  return html + (list ? "</ul>" : "");
+}
+
+function chip(name, color) {
+  return `<span class="chip" style="color:${color};border-color:${color};background:${color}22">${esc(name)}</span>`;
+}
+
+function render(d, title, secs) {
+  $("#out").innerHTML = `
+    <div class="issue-head"><span class="title">${esc(title)}</span><span class="num">#${d.issue_number}</span></div>
+    <div class="labels">${Object.entries(d.labels).map(([n, c]) => chip(n, c)).join("") || "<span class='meta'>No labels</span>"}</div>
+    <div class="comment">
+      <div class="who"><b>github-actions</b> bot commented</div>
+      <div class="md">${markdown(d.comment)}</div>
+    </div>
+    <div class="meta">Triaged in ${secs.toFixed(1)} s · checked against ${d.checked_against} open issues · preview only, nothing was posted
+      ${d.notes.length ? "<br>" + d.notes.map(esc).join("<br>") : ""}</div>`;
+}
+</script>
+</body>
+</html>

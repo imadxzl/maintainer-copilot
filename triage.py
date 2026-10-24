@@ -31,6 +31,7 @@ MARKER = "<!-- maintainer-copilot -->"
 MAX_IMAGES = 3
 MAX_IMAGE_BYTES = 5 * 1024 * 1024
 IMAGE_TYPES = {"image/png", "image/jpeg", "image/webp"}
+ALLOW_FILE_URLS = False  # set by --local so sample issues can load screenshots from disk
 
 LABELS = {
     "bug": ("d73a4a", "Something isn't working"),
@@ -149,6 +150,10 @@ def fetch_images(body):
     images, notes = [], []
     urls = IMG_MD.findall(body or "") + IMG_HTML.findall(body or "")
     for url in urls[:MAX_IMAGES]:
+        # Issue text is untrusted: only fetch web URLs (file:// is allowed for --local samples only).
+        if not (url.startswith(("https://", "http://")) or (ALLOW_FILE_URLS and url.startswith("file://"))):
+            notes.append(f"skipped {url} (unsupported URL)")
+            continue
         try:
             req = urllib.request.Request(url, headers={"User-Agent": "maintainer-copilot"})
             with urllib.request.urlopen(req, timeout=20) as resp:
@@ -301,7 +306,8 @@ def main():
     if not API_KEY:
         sys.exit("GEMINI_API_KEY is not set (env var or .env file).")
     if args.local:
-        repo, args.dry_run = LocalRepo(args.local), True
+        global ALLOW_FILE_URLS
+        repo, args.dry_run, ALLOW_FILE_URLS = LocalRepo(args.local), True, True
     elif args.repo:
         repo = GitHub(args.repo)
         if not args.dry_run and not GH_TOKEN:

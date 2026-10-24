@@ -31,6 +31,9 @@ To triage existing issues, go to **Actions → Maintainer Copilot → Run workfl
 ## Try the demo
 In this repo, run **Actions → Seed demo issues → Run workflow**. It creates six realistic issues (a full bug report, a vague one, a duplicate, a typo, a screenshot-only CI failure and a feature request) and triages them all.
 
+## Playground (no GitHub account needed)
+`app.py` is a small web page that runs the **same triage logic** on an issue you type, optionally with a screenshot. It checks duplicates against this repo's real open issues and shows the labels and comment the bot would post. Nothing is posted. Run it with `python app.py` and open http://localhost:8000. To deploy it, import the repo on Vercel (or any Python host) and set `GEMINI_API_KEY`. Each visitor gets 5 triages per 10 minutes.
+
 ## Run locally
 There are no dependencies to install, only Python's standard library.
 ```bash

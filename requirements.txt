@@ -1,0 +1,1 @@
+# No dependencies: standard library only. This file lets hosts (e.g. Vercel) detect a Python app.
