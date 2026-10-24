@@ -2,6 +2,8 @@
 
 **Issue triage for open-source maintainers, powered by Gemma 4. Screenshots included.**
 
+🔗 **Try it, no account needed: https://maintainer-copilot.vercel.app/**. Or [open a real issue](https://github.com/imadxzl/maintainer-copilot/issues/new) here and watch the bot reply in about 15 seconds.
+
 Open-source maintainers drown in issues: vague bug reports, duplicates, and screenshots of stack traces that nobody can search. Maintainer Copilot is a GitHub Action that reads every new issue, **including attached screenshots**, with Gemma 4 (an open-weights multimodal model). It then:
 
 - 🏷️ **Labels it**: `bug`, `enhancement`, `question` or `documentation`.

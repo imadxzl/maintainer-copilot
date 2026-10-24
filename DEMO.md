@@ -1,6 +1,6 @@
 # Maintainer Copilot: Demo Kit
 
-**Repo:** https://github.com/imadxzl/maintainer-copilot · **Live issues:** https://github.com/imadxzl/maintainer-copilot/issues
+**Playground:** https://maintainer-copilot.vercel.app/ · **Repo:** https://github.com/imadxzl/maintainer-copilot · **Live issues:** https://github.com/imadxzl/maintainer-copilot/issues
 
 ## 1. Two-minute pitch script (solo)
 
@@ -22,7 +22,7 @@ Zoom to 125% so the back row can read it.
 | 0:55–1:15 | "There it is, about 15 seconds after I filed it. It read the **exact error out of the image**, a 403, 'Resource not accessible by integration', plus the line number and versions, and suggested the actual fix: a token permissions problem." | Point at the 🖼️ line and the Next step |
 | 1:15–1:30 | "It also catches duplicates. This issue is worded completely differently from #1, but Copilot spotted that it's the same crash and explained why." | Tab 3: issue #3 |
 | 1:30–1:45 | "Vague reports get a checklist asking for exactly what's missing. Small, well-scoped fixes get tagged **good first issue** and **hacktoberfest**, so new contributors can find their first PR." | Back to Issues: point at #2 and #4 |
-| 1:45–2:00 | "Two files, one secret, five minutes to install, and every maintainer gets a triage assistant built on an open model. Maintainer Copilot. Thank you!" | README install section |
+| 1:45–2:00 | "Two files, one secret, five minutes to install. And you can try it right now at maintainer-copilot.vercel.app, no account needed. Maintainer Copilot. Thank you!" | Playground page |
 
 **If a judge asks…**
 - *"What if the model is wrong?"* It never closes or edits issues. It only labels and comments, and every comment says a human maintainer will review. Labels are restricted to an allowlist enforced in code.
@@ -42,6 +42,7 @@ Zoom to 125% so the back row can read it.
 Network trouble is the main risk. Drop down a layer if one fails:
 
 1. **Live issue** (best). File a fresh issue with a screenshot. Do one test run about 5 minutes before you present.
+   - If GitHub Actions is slow, use the **playground** (https://maintainer-copilot.vercel.app/) instead. Click **🖼️ Screenshot only**, then **Submit**. You get the same triage in about 12 seconds.
 2. **The issues already triaged.** If the live Action is slow, skip filing and walk through #5 (screenshot), #3 (duplicate), #2 (needs-info) and #4 (good first issue). They're already on GitHub.
 3. **Local dry run.** `python triage.py --local samples/issues.json --issue 5` prints the comment in the terminal. It needs the Gemini API, but not GitHub.
 4. **Pre-recorded video.** Record yourself filing an issue and refreshing until the comment appears, about 60 seconds.
@@ -59,6 +60,7 @@ Network trouble is the main risk. Drop down a layer if one fails:
 Maintainer Copilot
 
 ### Links
+- **Try it (no account needed):** https://maintainer-copilot.vercel.app/
 - **Code:** https://github.com/imadxzl/maintainer-copilot
 - **See it working:** https://github.com/imadxzl/maintainer-copilot/issues (every issue was triaged by the bot)
 
@@ -84,6 +86,7 @@ It posts **one comment per issue** and updates it in place on edits, so it never
 - **Code enforces the rules:** labels come only from an allowlist. Duplicates must reference a real, older, open issue. `needs-info`, `possible-duplicate` and `good first issue` are derived from the structured fields, not trusted from the model's own label list.
 - **Platform:** a GitHub Actions workflow using the built-in `GITHUB_TOKEN` (issues: write). There's a manual mode to triage an existing backlog, plus a one-click demo seeder.
 - **Zero dependencies:** a single Python file using only the standard library. Installing means copying two files and adding one secret.
+- **Playground:** a web page on Vercel that runs the same triage code on an issue you type, checks duplicates against the repo's real open issues, and previews the comment without posting. It's rate-limited per visitor and refuses non-web image links from untrusted input.
 
 ### Challenges I ran into
 - **Latency from thinking.** Gemma 4 reasons by default and was slow. `thinkingLevel: minimal` brought triage down to about 5 seconds per issue. This model accepts `minimal` and `high` but rejects `low`.
@@ -106,7 +109,7 @@ How to make an open model safe to run on untrusted input: let it judge, but have
 - GitLab support and a fully local Ollama mode for self-hosted projects.
 
 ### Built with
-`gemma-4` · `gemini-api` · `github-actions` · `github-rest-api` · `python`
+`gemma-4` · `gemini-api` · `github-actions` · `github-rest-api` · `python` · `javascript` · `vercel`
 
 ---
 
