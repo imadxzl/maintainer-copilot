@@ -26,7 +26,7 @@ For an issue whose only content is a screenshot of a failing CI log, Copilot rep
 1. Copy `triage.py` and `.github/workflows/maintainer-copilot.yml` into your repo.
 2. Get a Gemini API key from [Google AI Studio](https://aistudio.google.com/apikey).
 3. Go to **Settings → Secrets and variables → Actions → New repository secret**. Name it `GEMINI_API_KEY` and paste the key.
-4. Open an issue. Triage appears in about 30 seconds.
+4. Open an issue. Triag receivee appears in about 30 seconds.
 
 To triage existing issues, go to **Actions → Maintainer Copilot → Run workflow** and leave the issue number empty.
 
